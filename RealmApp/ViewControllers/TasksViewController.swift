@@ -29,7 +29,7 @@ class TasksViewController: UITableViewController {
         navigationItem.rightBarButtonItems = [addButton, editButtonItem]
     }
     
-    // MARK: - Table view data source
+    // MARK: - UITableViewDataSource
     override func numberOfSections(in tableView: UITableView) -> Int {
         2
     }
@@ -52,6 +52,48 @@ class TasksViewController: UITableViewController {
         return cell
     }
     
+    // MARK: - UITableViewDelegateMethods
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        let task: Task
+        let doneButton: String
+        if indexPath.section == 0 {
+            task = currentTasks[indexPath.row]
+            doneButton = "Done"
+        } else {
+            task = completedTasks[indexPath.row]
+            doneButton = "Undone"
+        }
+        
+        let deleteAction = UIContextualAction(style: .destructive, title: "Delete") { _, _, isDone in
+            StorageManager.shared.delete(task)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+            isDone(true)
+        }
+        
+        let editAction = UIContextualAction(style: .normal, title: "Edit") { _, _, isDone in
+            self.showAlert(with: task) {
+                tableView.reloadRows(at: [indexPath], with: .automatic)
+            }
+            isDone(true)
+        }
+        
+        let doneAction = UIContextualAction(style: .normal, title: doneButton) {_, _, isDone in
+            StorageManager.shared.done(task)
+            tableView.reloadData()
+            isDone(true)
+        }
+        
+        editAction.backgroundColor = .orange
+        doneAction.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
+        
+        return UISwipeActionsConfiguration(actions: [doneAction, editAction, deleteAction])
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
     @objc private func addButtonPressed() {
         showAlert()
     }
@@ -60,12 +102,20 @@ class TasksViewController: UITableViewController {
 
 extension TasksViewController {
     
-    private func showAlert() {
+    private func showAlert(with task: Task? = nil, completion: (()->Void)? = nil) {
         
-        let alert = AlertController.createAlert(withTitle: "New Task", andMessage: "What do you want to do?")
+        var alertTitle = "New Task"
+        if task != nil { alertTitle = "Edit Task" }
         
-        alert.action { newValue, note in
-            self.saveTask(withName: newValue, andNote: note)
+        let alert = AlertController.createAlert(withTitle: alertTitle, andMessage: "What do you want to do?")
+        
+        alert.action(with: task) { name, note in
+            if let task = task, let completion = completion {
+                StorageManager.shared.edit(task, newName: name, newNote: note)
+                completion()
+            } else {
+                self.saveTask(withName: name, andNote: note)
+            }
         }
         
         present(alert, animated: true)
@@ -77,5 +127,5 @@ extension TasksViewController {
         let rowIndex = IndexPath(row: currentTasks.index(of: task) ?? 0, section: 0)
         tableView.insertRows(at: [rowIndex], with: .automatic)
     }
+    
 }
-
