@@ -19,7 +19,7 @@ class AlertController: UIAlertController {
         
         if taskList != nil { doneButton = "Update" }
                 
-        let saveAction = UIAlertAction(title: self.doneButton, style: .default) { _ in
+        let saveAction = UIAlertAction(title: doneButton, style: .default) { _ in
             guard let newValue = self.textFields?.first?.text else { return }
             guard !newValue.isEmpty else { return }
             completion(newValue)
@@ -39,7 +39,7 @@ class AlertController: UIAlertController {
         
         if task != nil { doneButton = "Update" }
         
-        let saveAction = UIAlertAction(title: self.doneButton, style: .default) { _ in
+        let saveAction = UIAlertAction(title: doneButton, style: .default) { _ in
             guard let newTask = self.textFields?.first?.text else { return }
             guard !newTask.isEmpty else { return }
             
