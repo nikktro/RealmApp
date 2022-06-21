@@ -82,11 +82,7 @@ class TaskListViewController: UITableViewController {
     }
     
     @IBAction func sortingList(_ sender: UISegmentedControl) {
-        let sort: String
-        switch sender.selectedSegmentIndex {
-            case 0: sort = "date"
-            default: sort = "name"
-        }
+        let sort = sender.selectedSegmentIndex == 0 ? "date" : "name"
         taskLists = taskLists.sorted(byKeyPath: sort, ascending: true)
         tableView.reloadData()
     }
@@ -104,10 +100,15 @@ class TaskListViewController: UITableViewController {
     }
 }
 
+// MARK: - Private Methods for Alert
 extension TaskListViewController {
     
     private func showAlert(with taskList: TaskList? = nil, completion: (() -> Void)? = nil) {
-        let alert = AlertController.createAlert(withTitle: "New List", andMessage: "Please insert new value")
+        
+        var alertTitle = "New List"
+        if taskList != nil { alertTitle = "Edit List" }
+        
+        let alert = AlertController.createAlert(withTitle: alertTitle, andMessage: "Please insert new value")
         
         alert.action(with: taskList) { newValue in
             if let taskList = taskList, let completion = completion {

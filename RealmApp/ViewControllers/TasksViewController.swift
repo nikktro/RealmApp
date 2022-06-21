@@ -81,7 +81,7 @@ class TasksViewController: UITableViewController {
         let doneAction = UIContextualAction(style: .normal, title: doneButton) {_, _, isDone in
             StorageManager.shared.done(task)
             
-            let indexSet = IndexSet(integersIn: 0..<self.tableView.numberOfSections)
+            let indexSet = IndexSet(integersIn: 0..<tableView.numberOfSections)
             tableView.reloadSections(indexSet, with: .automatic)
             isDone(true)
         }
@@ -102,6 +102,7 @@ class TasksViewController: UITableViewController {
 
 }
 
+// MARK: - Private Methods for Alert
 extension TasksViewController {
     
     private func showAlert(with task: Task? = nil, completion: (()->Void)? = nil) {
