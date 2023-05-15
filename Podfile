@@ -6,6 +6,6 @@ target 'RealmApp' do
   use_frameworks!
 
   # Pods for RealmApp
-  pod 'RealmSwift', '~>10'
+  pod 'RealmSwift', '10.28.0'
 
 end
